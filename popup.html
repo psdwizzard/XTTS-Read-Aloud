@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>XTTS Read Aloud Settings</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Assuming you have a CSS file for styling -->
+</head>
+<body>
+    <div class="header">
+        <img src="images/icon128.png" alt="Logo">
+        <h1>XTTS Read Aloud</h1>
+    </div>
+    <div class="content">
+        <label for="serverIp">Server IP:</label>
+        <input type="text" id="serverIp" placeholder="Enter server IP address">
+        <button id="saveServerIp">Save Server IP</button>
+        <br>
+        <button id="refreshList">Refresh List</button>
+        <select id="voiceList"></select>
+        <button id="loadVoice">Load Voice</button>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

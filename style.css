@@ -1,0 +1,22 @@
+.header {
+    text-align: center;
+    padding: 10px;
+}
+
+.content {
+    margin: 10px;
+    text-align: center;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 20px;
+    background-color: gold;
+    border: none;
+    cursor: pointer;
+}
+
+select {
+    width: 100%;
+    margin: 10px 0;
+}
