@@ -2,6 +2,9 @@
 
 This Chrome extension integrates screen reader functionality using the XTTS API Server. Currently in beta and using the XTTS API Server backend, it will soon move to AllTalk. It enhances web accessibility with seamless text-to-speech capabilities. Licensed under the MIT License for unrestricted and commercial use.
 
+Disclaimer:
+This is a personal project created in my free time. It does not represent my employer or their views.
+
 ---
 
 ## Overview of Project
