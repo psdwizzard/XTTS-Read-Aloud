@@ -1,0 +1,58 @@
+[
+  {
+    "type": "set",
+    "name": "Favs",
+    "voices": [
+      { "name": "Jefferson","voice_id": "M_Jefferson.wav" },
+      { "name": "F Maggie", "voice_id": "F_Maggie.wav" },
+      { "name": "Rachel", "voice_id": "M_Rachel.wav" },
+      { "name": "George", "voice_id": "M_George.wav" },
+      { "name": "Rose", "voice_id": "rose.wav" },
+      { "name": "Adrian", "voice_id": "M_Adrian.wav" }
+    ]
+  },
+  {
+    "type": "set",
+    "name": "female",
+    "voices": [
+      { "name": "F Elizabeth", "voice_id": "F_Elizabeth.wav" },
+      { "name": "F Maggie", "voice_id": "F_Maggie.wav" },
+      { "name": "Gabrielle", "voice_id": "Gabrielle.wav" },
+      { "name": "Natalie", "voice_id": "Natalie.wav" },
+      { "name": "Rose", "voice_id": "rose.wav" },
+      { "name": "Suzy", "voice_id": "Suzy.wav" }
+    ]
+  },
+  {
+    "type": "set",
+    "name": "male",
+    "voices": [
+      { "name": "Jonathan", "voice_id": "Jonathan.wav" },
+      { "name": "M Andrew", "voice_id": "M_Andrew.wav" },
+      { "name": "M Frank", "voice_id": "M_Frank.wav" },
+      { "name": "M Sam", "voice_id": "M_Sam.wav" },
+      { "name": "M Will P", "voice_id": "M_Will_P.wav" },
+      { "name": "Pete", "voice_id": "Pete.wav" },
+      { "name": "Ray", "voice_id": "Ray.wav" },
+      { "name": "Scott", "voice_id": "Scott.wav" }
+    ]
+  },
+  {
+    "type": "set",
+    "name": "mix",
+    "voices": [
+      { "name": "M Frank", "voice_id": "M_Frank.wav" },
+      { "name": "Scott", "voice_id": "Scott.wav" },
+      { "name": "Jonathan", "voice_id": "Jonathan.wav" },
+      { "name": "Pete", "voice_id": "Pete.wav" },
+      { "name": "M Andrew", "voice_id": "M_Andrew.wav" },
+      { "name": "F Elizabeth", "voice_id": "F_Elizabeth.wav" },
+      { "name": "F Maggie", "voice_id": "F_Maggie.wav" },
+      { "name": "M Sam", "voice_id": "M_Sam.wav" },
+      { "name": "M Will P", "voice_id": "M_Will_P.wav" },
+      { "name": "Rose", "voice_id": "rose.wav" },
+      { "name": "Suzy", "voice_id": "Suzy.wav" },
+      { "name": "Ray", "voice_id": "Ray.wav" }
+    ]
+  }
+]
