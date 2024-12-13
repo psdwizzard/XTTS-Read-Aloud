@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>XTTS Read Aloud Settings</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Assuming you have a CSS file for styling -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="header">
@@ -16,9 +16,22 @@
         <button id="saveServerIp">Save Server IP</button>
         <br>
         <button id="refreshList">Refresh List</button>
-        <select id="voiceList"></select>
-        <button id="loadVoice">Load Voice</button>
+        <select id="voiceList">
+            <option value="">-- Select a Voice or Set --</option>
+        </select>
+        <button id="loadVoice">Load Selection</button>
     </div>
+
+    <div class="current-voice">
+        <h2>Current Voice/Set:</h2>
+        <p id="currentVoice">Loading...</p>
+    </div>
+
+    <!-- Button to create custom playlists -->
+    <div class="content">
+        <button id="createNewList">CREATE NEW LIST</button>
+    </div>
+
     <script src="popup.js"></script>
 </body>
 </html>

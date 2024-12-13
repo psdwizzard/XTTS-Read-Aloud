@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Playlist</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Create a New Playlist</h1>
+    </div>
+    <div class="content">
+        <label for="playlistName">Playlist Name:</label>
+        <input type="text" id="playlistName" placeholder="Enter playlist name">
+        <br><br>
+        <button id="refreshVoices">Refresh Voices</button>
+        <div id="voicesContainer">
+            <!-- Checkboxes for each voice will be inserted here -->
+        </div>
+        <br>
+        <button id="savePlaylist">Save Playlist</button>
+        <button id="closeWindow">Close</button>
+    </div>
+
+    <script src="create_playlist.js"></script>
+</body>
+</html>
