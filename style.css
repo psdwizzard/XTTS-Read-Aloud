@@ -3,7 +3,7 @@
     padding: 10px;
 }
 
-.content {
+.content, .current-voice {
     margin: 10px;
     text-align: center;
 }
@@ -14,9 +14,24 @@ button {
     background-color: gold;
     border: none;
     cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
 }
 
-select {
+select, input[type="text"] {
     width: 100%;
     margin: 10px 0;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+.current-voice p {
+    font-weight: bold;
+    color: #333;
+}
+
+.header img {
+    width: 64px;
+    height: 64px;
 }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "XTTS Read Aloud",
-  "version": "1.0",
+  "name": "XRA - o1",
+  "version": "1.5",
   "description": "A Chrome extension that reads highlighted text aloud using the XTTS API.",
   "permissions": [
     "activeTab",
@@ -37,5 +37,11 @@
       },
       "description": "Play selected text aloud using the XTTS API."
     }
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["voiceSets.json"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
