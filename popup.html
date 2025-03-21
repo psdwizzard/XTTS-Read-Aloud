@@ -3,33 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <title>XTTS Read Aloud Settings</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="header">
         <img src="images/icon128.png" alt="Logo">
         <h1>XTTS Read Aloud</h1>
     </div>
-    <div class="content">
-        <label for="serverIp">Server IP:</label>
-        <input type="text" id="serverIp" placeholder="Enter server IP address">
-        <button id="saveServerIp">Save Server IP</button>
-        <br>
-        <button id="refreshList">Refresh List</button>
-        <select id="voiceList">
-            <option value="">-- Select a Voice or Set --</option>
-        </select>
-        <button id="loadVoice">Load Selection</button>
+    
+    <!-- Tab navigation -->
+    <div class="tab-navigation">
+        <button class="tab-button active" data-tab="server-tab">Server</button>
+        <button class="tab-button" data-tab="playlist-tab">Create Playlist</button>
+        <button class="tab-button" data-tab="dictionary-tab">Dictionary</button>
+    </div>
+    
+    <!-- Server tab content -->
+    <div class="tab-content active" id="server-tab">
+        <div class="content">
+            <div class="server-ip-container">
+                <div class="server-ip-input">
+                    <label for="serverIp">Server IP:</label>
+                    <input type="text" id="serverIp" placeholder="Enter server IP">
+                </div>
+                <button id="saveServerIp">Save</button>
+            </div>
+            
+            <div class="button-row">
+                <button id="refreshList">Refresh List</button>
+                <button id="loadVoice">Load Selection</button>
+            </div>
+            
+            <select id="voiceList">
+                <option value="">-- Select a Voice or Set --</option>
+            </select>
+        </div>
+
+        <div class="current-voice">
+            <h2>Current Voice/Set:</h2>
+            <p id="currentVoice">Loading...</p>
+        </div>
+    </div>
+    
+    <!-- Create Playlist tab content -->
+    <div class="tab-content" id="playlist-tab">
+        <div class="content">
+            <label for="playlistName">Playlist Name:</label>
+            <input type="text" id="playlistName" placeholder="Enter playlist name">
+            
+            <button id="refreshVoices">Refresh Voices</button>
+            
+            <div class="voice-list-container">
+                <div id="voiceCheckboxes" class="voice-checkboxes">
+                    <!-- Voice checkboxes will be added here via JavaScript -->
+                </div>
+            </div>
+            
+            <button id="savePlaylist">Save Playlist</button>
+        </div>
+    </div>
+    
+    <!-- Dictionary tab content -->
+    <div class="tab-content" id="dictionary-tab">
+        <div class="content">
+            <div class="dictionary-form">
+                <div class="dictionary-inputs">
+                    <div class="form-group">
+                        <label for="dictionaryWord">Word:</label>
+                        <input type="text" id="dictionaryWord" placeholder="Word to correct">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dictionaryPronunciation">Pronunciation:</label>
+                        <input type="text" id="dictionaryPronunciation" placeholder="Phonetic pronunciation">
+                    </div>
+                </div>
+                
+                <button id="addToDictionary">Add</button>
+            </div>
+            
+            <div class="dictionary-list-container">
+                <h3>Dictionary Entries</h3>
+                <div id="dictionaryEntries" class="dictionary-entries">
+                    <!-- Dictionary entries will be added here via JavaScript -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="current-voice">
-        <h2>Current Voice/Set:</h2>
-        <p id="currentVoice">Loading...</p>
-    </div>
-
-    <!-- Button to create custom playlists -->
-    <div class="content">
-        <button id="createNewList">CREATE NEW LIST</button>
+    <!-- Theme toggle button -->
+    <div class="theme-toggle">
+        <button id="toggleTheme">Toggle Dark Mode</button>
     </div>
 
     <script src="popup.js"></script>

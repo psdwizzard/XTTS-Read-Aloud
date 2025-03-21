@@ -2,14 +2,49 @@
 
 This Chrome extension integrates screen reader functionality using the XTTS API Server. Currently in beta and using the XTTS API Server backend, it will soon move to AllTalk. It enhances web accessibility with seamless text-to-speech capabilities. Licensed under the MIT License for unrestricted and commercial use.
 
+![Screenshot Example](images/example.png)
+
 Disclaimer:
 This is a personal project created in my free time. It does not represent my employer or their views.
+
+---
+
+## Recent Improvements
+
+- **Modern UI Design**: Completely redesigned interface with card-based layout and improved typography
+- **Dark Mode Support**: Added toggle for light/dark themes, saved across sessions
+- **Tabbed Interface**: Separated functionality into Server, Playlist, and Dictionary tabs
+- **Custom Pronunciation Dictionary**: Added ability to create a custom dictionary to correct mispronounced words
+- **Improved Text Processing**: Better handling of punctuation, parentheses, and special cases
+- **Custom Voice Sets**: Create and manage playlists of voices for variety in your text-to-speech experience
+- **Error Handling**: Enhanced connection error handling with clear feedback
+- **Responsive Layout**: Compact, efficient design that's easy to navigate
 
 ---
 
 ## Overview of Project
 
 I use a screen reader every day for surfing the web and work. I hate how bad most voices are in screen readers, but I did not want to have a monthly subscription for a good screen reader. This extension currently works on the XTTS API Server backend, which cannot stream audio over the network as I had hoped. I wanted to deploy this on my network to use on all of my computers. I am in the process of moving this to AllTalk, but it is taking longer than expected.
+
+---
+
+## Features
+
+### Server Tab
+- Connect to your XTTS API Server instance
+- Select from individual voices or custom voice sets
+- View your currently active voice/set
+
+### Create Playlist Tab
+- Create custom voice sets by selecting multiple voices
+- Name and save playlists for later use
+- Automatically refreshes voice lists from your server
+
+### Dictionary Tab
+- Add words that the TTS engine mispronounces
+- Provide phonetic pronunciations that sound better
+- Entries are automatically applied during text processing
+- Alphabetically sorted for easy reference
 
 ---
 
@@ -59,9 +94,20 @@ This extension uses the [XTTS API Server](https://github.com/daswer123/xtts-api-
 
 1. Pin the extension to the top for easy access.
 2. Click on it, and you will see the server IP field. You can enter `localhost` or the subnet IP address of your server (e.g., `192.168.1.100`).
-3. Click "Save Server IP".
-4. Click "Refresh list" to load all your voices.
-5. Once you have selected your voice, click "Load Voice".
+3. Click "Save".
+4. Click "Refresh List" to load all your voices.
+5. Select a voice or voice set from the dropdown.
+6. Click "Load Selection".
+
+### Setting Up the Dictionary
+
+If you encounter words that the TTS engine mispronounces:
+
+1. Switch to the Dictionary tab.
+2. Enter the word in the "Word" field.
+3. Enter the phonetic spelling in the "Pronunciation" field.
+4. Click "Add" to save to your dictionary.
+5. The next time this word appears in text, it will automatically be replaced with your phonetic version.
 
 ---
 
@@ -83,3 +129,21 @@ Highlight any text, right-click on it, and select "Read Aloud" Orange to have th
 ## Voices
 
 I cannot release the voices in the demo due to copyright reasons. You will have to add your own. These clips need to be clean audio of at least 10 seconds, though most of mine are 30 seconds. I like to use Audacity to cut out large silent parts. Additionally, a well-finetuned XTTS2 model really helps.
+
+---
+
+## Technical Details
+
+The extension uses Chrome's storage API to save:
+- Server IP address
+- Selected voice/set
+- Custom voice sets (playlists)
+- Custom dictionary entries
+- UI theme preference
+
+Text preprocessing pipeline:
+1. Dictionary word replacement (using custom phonetic spellings)
+2. Abbreviation expansion (e.g., "Dr." → "Doctor")
+3. Parentheses handling (keeping content with natural pauses)
+4. Special character and URL handling
+5. Natural pauses after sentence-ending punctuation
