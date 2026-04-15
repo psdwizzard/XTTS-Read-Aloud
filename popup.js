@@ -46,16 +46,26 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function getSpeakersUrl(connectionMode, relayUrl, serverIp) {
+    if (connectionMode === 'relay') {
+        return `${relayUrl}/api/tts/speakers`;
+    }
+    return `http://${serverIp}:8020/speakers`;
+}
+
 function displayCurrentVoice() {
-    chrome.storage.local.get(['selectedVoice', 'selectedSet', 'serverIp'], function(result) {
+    chrome.storage.local.get(['selectedVoice', 'selectedSet', 'serverIp', 'connectionMode', 'relayUrl'], function(result) {
         const selectedVoiceId = result.selectedVoice || '';
         const selectedSetName = result.selectedSet || '';
         const serverIp = result.serverIp || 'localhost';
+        const connectionMode = result.connectionMode || 'relay';
+        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
 
         if (selectedSetName) {
             document.getElementById('currentVoice').textContent = `Set: ${capitalizeFirstLetter(selectedSetName)}`;
         } else if (selectedVoiceId) {
-            fetch(`http://${serverIp}:8020/speakers`)
+            const speakersUrl = getSpeakersUrl(connectionMode, relayUrl, serverIp);
+            fetch(speakersUrl)
                 .then(response => response.json())
                 .then(voices => {
                     const currentVoice = voices.find(v => v.voice_id === selectedVoiceId);
@@ -326,33 +336,38 @@ function loadTheme() {
 
 document.getElementById('saveServerIp').addEventListener('click', function() {
     const serverIp = document.getElementById('serverIp').value;
-    chrome.storage.local.set({serverIp: serverIp}, function() {
-        console.log("Server IP saved:", serverIp);
+    const connectionMode = document.querySelector('input[name="connectionMode"]:checked').value;
+    const relayUrl = document.getElementById('relayUrl').value.replace(/\/+$/, ''); // trim trailing slashes
+    chrome.storage.local.set({serverIp: serverIp, connectionMode: connectionMode, relayUrl: relayUrl}, function() {
+        console.log("Connection settings saved:", { connectionMode, relayUrl, serverIp });
         displayCurrentVoice();
     });
 });
 
 document.getElementById('refreshList').addEventListener('click', function() {
-    chrome.storage.local.get(['serverIp'], function(result) {
+    chrome.storage.local.get(['serverIp', 'connectionMode', 'relayUrl'], function(result) {
         const serverIp = result.serverIp || 'localhost';
-        
+        const connectionMode = result.connectionMode || 'relay';
+        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
+        const speakersUrl = getSpeakersUrl(connectionMode, relayUrl, serverIp);
+
         // Show loading indicator
         document.getElementById('currentVoice').textContent = 'Connecting to server...';
-        
+
         // Setup timeout for the fetch operation
-        const fetchPromise = fetch(`http://${serverIp}:8020/speakers`, {
+        const fetchPromise = fetch(speakersUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Cache-Control': 'no-cache'
             }
         });
-        
+
         // Set a timeout of 5 seconds
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Connection timed out')), 5000)
         );
-        
+
         // Race between fetch and timeout
         Promise.race([fetchPromise, timeoutPromise])
             .then(response => {
@@ -370,9 +385,10 @@ document.getElementById('refreshList').addEventListener('click', function() {
             })
             .catch(error => {
                 console.error('Error fetching voices:', error);
-                document.getElementById('currentVoice').textContent = 
-                    `Connection error: Please check if server is running at ${serverIp}:8020`;
-                
+                const target = connectionMode === 'relay' ? relayUrl : `${serverIp}:8020`;
+                document.getElementById('currentVoice').textContent =
+                    `Connection error: Cannot reach ${target}`;
+
                 // Still populate the dropdown with sets even if server is unreachable
                 fetchVoiceSets(function(voiceSets) {
                     // Just show sets without individual voices
@@ -384,23 +400,26 @@ document.getElementById('refreshList').addEventListener('click', function() {
 
 // Function to fetch voices for the playlist tab
 function fetchVoicesForPlaylist() {
-    chrome.storage.local.get(['serverIp'], function(result) {
+    chrome.storage.local.get(['serverIp', 'connectionMode', 'relayUrl'], function(result) {
         const serverIp = result.serverIp || 'localhost';
-        
+        const connectionMode = result.connectionMode || 'relay';
+        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
+        const speakersUrl = getSpeakersUrl(connectionMode, relayUrl, serverIp);
+
         // Setup timeout for the fetch operation
-        const fetchPromise = fetch(`http://${serverIp}:8020/speakers`, {
+        const fetchPromise = fetch(speakersUrl, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'Cache-Control': 'no-cache'
             }
         });
-        
+
         // Set a timeout of 5 seconds
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Connection timed out')), 5000)
         );
-        
+
         // Race between fetch and timeout
         Promise.race([fetchPromise, timeoutPromise])
             .then(response => {
@@ -442,27 +461,61 @@ document.getElementById('savePlaylist').addEventListener('click', savePlaylist);
 // Add event listener for the add to dictionary button
 document.getElementById('addToDictionary').addEventListener('click', addDictionaryEntry);
 
+// Toggle visibility of relay URL vs server IP based on connection mode
+function updateConnectionModeUI(mode) {
+    const relayContainer = document.getElementById('relayUrlContainer');
+    const serverIpContainer = document.getElementById('serverIpContainer');
+    if (mode === 'relay') {
+        relayContainer.style.display = 'block';
+        serverIpContainer.style.display = 'none';
+    } else {
+        relayContainer.style.display = 'none';
+        serverIpContainer.style.display = 'flex';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Set up tabs
     setupTabs();
-    
-    // Initialize the interface
-    displayCurrentVoice();
-    document.getElementById('refreshList').click();
-    
-    // Populate the voice checkboxes in the playlist tab
-    fetchVoicesForPlaylist();
-    
-    // Load dictionary entries
-    loadDictionary();
-    
-    // Load saved server IP
-    chrome.storage.local.get(['serverIp'], function(result) {
+
+    // Set up connection mode radio button listeners
+    document.querySelectorAll('input[name="connectionMode"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateConnectionModeUI(this.value);
+        });
+    });
+
+    // Load saved connection settings and server IP
+    chrome.storage.local.get(['serverIp', 'connectionMode', 'relayUrl'], function(result) {
+        const connectionMode = result.connectionMode || 'relay';
+        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
+
+        // Set radio button
+        const radioEl = document.querySelector(`input[name="connectionMode"][value="${connectionMode}"]`);
+        if (radioEl) radioEl.checked = true;
+
+        // Set relay URL
+        document.getElementById('relayUrl').value = relayUrl;
+
+        // Set server IP
         if (result.serverIp) {
             document.getElementById('serverIp').value = result.serverIp;
         }
+
+        // Update UI visibility
+        updateConnectionModeUI(connectionMode);
     });
-    
+
+    // Initialize the interface
+    displayCurrentVoice();
+    document.getElementById('refreshList').click();
+
+    // Populate the voice checkboxes in the playlist tab
+    fetchVoicesForPlaylist();
+
+    // Load dictionary entries
+    loadDictionary();
+
     // Load saved theme
     loadTheme();
 });

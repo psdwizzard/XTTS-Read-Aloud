@@ -186,44 +186,62 @@ function preprocessAdvancedText(text) {
 
 // Function to send text to XTTS API and retrieve audio blob
 function fetchAudio(text, voiceId, serverIp) {
-    const apiUrl = `http://${serverIp}:8020/tts_to_audio/`;
-    
-    fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            text: text,
-            speaker_wav: voiceId,
-            language: "en"
-        })
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch audio: ' + response.statusText);
+    // Read connection mode from storage, then fetch audio
+    chrome.storage.local.get(['connectionMode', 'relayUrl'], function(settings) {
+        const connectionMode = settings.connectionMode || 'relay';
+        const relayUrl = (settings.relayUrl || 'https://darkfoundry.bluemediaserver.xyz').replace(/\/+$/, '');
+
+        let apiUrl, bodyPayload;
+
+        if (connectionMode === 'relay') {
+            apiUrl = `${relayUrl}/api/tts/synthesize`;
+            bodyPayload = {
+                text: text,
+                voiceId: voiceId,
+                language: "en"
+            };
+        } else {
+            apiUrl = `http://${serverIp}:8020/tts_to_audio/`;
+            bodyPayload = {
+                text: text,
+                speaker_wav: voiceId,
+                language: "en"
+            };
         }
-        return response.blob();
-    })
-    .then(blob => {
-        // Create a URL from the blob
-        const audioUrl = URL.createObjectURL(blob);
-        
-        // Use chrome.tabs API to execute a content script that plays the audio
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-            const currentTabId = tabs[0]?.id;
-            if (currentTabId) {
-                chrome.tabs.sendMessage(currentTabId, {
-                    action: "playAudio", 
-                    audioUrl: audioUrl,
-                    speed: 1.0
-                });
-            } else {
-                console.error('No active tab found to play audio');
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyPayload)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch audio: ' + response.statusText);
             }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create a URL from the blob
+            const audioUrl = URL.createObjectURL(blob);
+
+            // Use chrome.tabs API to execute a content script that plays the audio
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                const currentTabId = tabs[0]?.id;
+                if (currentTabId) {
+                    chrome.tabs.sendMessage(currentTabId, {
+                        action: "playAudio",
+                        audioUrl: audioUrl,
+                        speed: 1.0
+                    });
+                } else {
+                    console.error('No active tab found to play audio');
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching audio:', error);
         });
-    })
-    .catch(error => {
-        console.error('Error fetching audio:', error);
     });
 }

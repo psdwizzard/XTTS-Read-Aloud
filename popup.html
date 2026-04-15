@@ -21,11 +21,33 @@
     <!-- Server tab content -->
     <div class="tab-content active" id="server-tab">
         <div class="content">
-            <div class="server-ip-container">
+            <div class="connection-mode-container">
+                <label>Connection Mode:</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="connectionMode" value="relay" id="modeRelay" checked>
+                        Cloudflare Relay
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="connectionMode" value="direct" id="modeDirect">
+                        Direct (LAN)
+                    </label>
+                </div>
+            </div>
+
+            <div class="relay-url-container" id="relayUrlContainer">
+                <label for="relayUrl">Relay URL:</label>
+                <input type="text" id="relayUrl" placeholder="https://darkfoundry.bluemediaserver.xyz" value="https://darkfoundry.bluemediaserver.xyz">
+            </div>
+
+            <div class="server-ip-container" id="serverIpContainer" style="display: none;">
                 <div class="server-ip-input">
                     <label for="serverIp">Server IP:</label>
                     <input type="text" id="serverIp" placeholder="Enter server IP">
                 </div>
+            </div>
+
+            <div class="save-connection-container">
                 <button id="saveServerIp">Save</button>
             </div>
             

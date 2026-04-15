@@ -193,6 +193,48 @@ label {
     margin-right: 8px;
 }
 
+/* Connection Mode */
+.connection-mode-container {
+    margin-bottom: 8px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: normal;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.radio-label input[type="radio"] {
+    margin: 0;
+    accent-color: var(--accent-color);
+}
+
+.relay-url-container {
+    margin-bottom: 8px;
+}
+
+.relay-url-container input[type="text"] {
+    width: 100%;
+}
+
+.save-connection-container {
+    margin-bottom: 5px;
+}
+
+.save-connection-container button {
+    width: 100%;
+}
+
 /* Server IP input container */
 .server-ip-container {
     display: flex;
