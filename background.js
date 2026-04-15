@@ -138,6 +138,59 @@ function blobToDataUrl(blob) {
     });
 }
 
+function sendAudioToTab(tabId, payload) {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.sendMessage(tabId, payload, () => {
+            if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+                return;
+            }
+            resolve();
+        });
+    });
+}
+
+function injectContentScript(tabId) {
+    return new Promise((resolve, reject) => {
+        chrome.scripting.executeScript({
+            target: { tabId },
+            files: ['content.js']
+        }, () => {
+            if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+                return;
+            }
+            resolve();
+        });
+    });
+}
+
+async function deliverAudioToActiveTab(audioUrl) {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const currentTabId = tabs[0]?.id;
+    if (!currentTabId) {
+        throw new Error('No active tab found to play audio');
+    }
+
+    const payload = {
+        action: 'playAudio',
+        audioUrl,
+        speed: 1.0
+    };
+
+    try {
+        await sendAudioToTab(currentTabId, payload);
+    } catch (error) {
+        const message = String(error instanceof Error ? error.message : error);
+        if (!/Receiving end does not exist/i.test(message)) {
+            throw error;
+        }
+
+        await injectContentScript(currentTabId);
+        await sendAudioToTab(currentTabId, payload);
+    }
+}
+
 // Context menu click handler
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     if (info.menuItemId === "readAloud" && info.selectionText) {
@@ -268,23 +321,7 @@ function fetchAudio(text, voiceId, serverIp) {
         })
         .then(blobToDataUrl)
         .then(audioUrl => {
-            // Use chrome.tabs API to execute a content script that plays the audio
-            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                const currentTabId = tabs[0]?.id;
-                if (currentTabId) {
-                    chrome.tabs.sendMessage(currentTabId, {
-                        action: "playAudio",
-                        audioUrl: audioUrl,
-                        speed: 1.0
-                    }, () => {
-                        if (chrome.runtime.lastError) {
-                            console.error('Error delivering audio to tab:', chrome.runtime.lastError.message);
-                        }
-                    });
-                } else {
-                    console.error('No active tab found to play audio');
-                }
-            });
+            return deliverAudioToActiveTab(audioUrl);
         })
         .catch(error => {
             console.error('Error fetching audio:', error);

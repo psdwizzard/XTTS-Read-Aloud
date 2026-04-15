@@ -6,7 +6,8 @@
   "permissions": [
     "storage",
     "contextMenus",
-    "tabs"
+    "tabs",
+    "scripting"
   ],
   "host_permissions": [
     "http://*/*",
