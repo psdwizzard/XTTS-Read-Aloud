@@ -1,3 +1,5 @@
+let activeAudio = null;
+
 // Function to send the selected text to the background script
 function sendSelectedText() {
     const selectedText = window.getSelection().toString().trim();
@@ -23,27 +25,46 @@ document.addEventListener("keydown", function (e) {
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
     if (message.action === "playAudio") {
+        if (activeAudio) {
+            activeAudio.pause();
+            activeAudio = null;
+        }
+
         const audio = new Audio(message.audioUrl);
+        activeAudio = audio;
         
         // Set playback speed
         if (message.speed) {
             audio.playbackRate = message.speed;
         }
         
-        // Add event listener to revoke the URL when audio is done playing
+        // Clean up after playback finishes.
         audio.addEventListener('ended', function() {
-            URL.revokeObjectURL(message.audioUrl);
+            if (message.audioUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(message.audioUrl);
+            }
+            if (activeAudio === audio) {
+                activeAudio = null;
+            }
         });
         
         // Handle errors
         audio.addEventListener('error', function(e) {
             console.error('Error playing audio:', e);
-            URL.revokeObjectURL(message.audioUrl);
+            if (message.audioUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(message.audioUrl);
+            }
+            if (activeAudio === audio) {
+                activeAudio = null;
+            }
         });
         
         // Play the audio
         audio.play().catch(error => {
             console.error('Error starting audio playback:', error);
+            if (activeAudio === audio) {
+                activeAudio = null;
+            }
         });
         
         return true; // Keep the message channel open for asynchronous response

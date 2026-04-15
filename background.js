@@ -126,6 +126,18 @@ function ensureRelayAuthenticated(response, relayUrl) {
     return response;
 }
 
+function blobToDataUrl(blob) {
+    return blob.arrayBuffer().then(buffer => {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const chunkSize = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+            binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+        }
+        return `data:${blob.type || 'audio/wav'};base64,${btoa(binary)}`;
+    });
+}
+
 // Context menu click handler
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     if (info.menuItemId === "readAloud" && info.selectionText) {
@@ -254,10 +266,8 @@ function fetchAudio(text, voiceId, serverIp) {
             }
             return response.blob();
         })
-        .then(blob => {
-            // Create a URL from the blob
-            const audioUrl = URL.createObjectURL(blob);
-
+        .then(blobToDataUrl)
+        .then(audioUrl => {
             // Use chrome.tabs API to execute a content script that plays the audio
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                 const currentTabId = tabs[0]?.id;
@@ -266,6 +276,10 @@ function fetchAudio(text, voiceId, serverIp) {
                         action: "playAudio",
                         audioUrl: audioUrl,
                         speed: 1.0
+                    }, () => {
+                        if (chrome.runtime.lastError) {
+                            console.error('Error delivering audio to tab:', chrome.runtime.lastError.message);
+                        }
                     });
                 } else {
                     console.error('No active tab found to play audio');
