@@ -96,6 +96,8 @@ function fetchRandomVoiceFromSet(setName, voiceSets) {
     });
 }
 
+const DEFAULT_RELAY_URL = 'https://your-cloudflare-url.example.com';
+
 function isCloudflareAccessUrl(url) {
     return typeof url === 'string' && url.includes('cloudflareaccess.com');
 }
@@ -284,7 +286,7 @@ function fetchAudio(text, voiceId, serverIp) {
     // Read connection mode from storage, then fetch audio
     chrome.storage.local.get(['connectionMode', 'relayUrl'], function(settings) {
         const connectionMode = settings.connectionMode || 'relay';
-        const relayUrl = (settings.relayUrl || 'https://darkfoundry.bluemediaserver.xyz').replace(/\/+$/, '');
+        const relayUrl = (settings.relayUrl || DEFAULT_RELAY_URL).replace(/\/+$/, '');
 
         let apiUrl, bodyPayload;
 

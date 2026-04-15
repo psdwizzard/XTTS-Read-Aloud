@@ -53,6 +53,8 @@ function getSpeakersUrl(connectionMode, relayUrl, serverIp) {
     return `http://${serverIp}:8020/speakers`;
 }
 
+const DEFAULT_RELAY_URL = 'https://your-cloudflare-url.example.com';
+
 function isCloudflareAccessUrl(url) {
     return typeof url === 'string' && url.includes('cloudflareaccess.com');
 }
@@ -89,7 +91,7 @@ function displayCurrentVoice() {
         const selectedSetName = result.selectedSet || '';
         const serverIp = result.serverIp || 'localhost';
         const connectionMode = result.connectionMode || 'relay';
-        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
+        const relayUrl = result.relayUrl || DEFAULT_RELAY_URL;
 
         if (selectedSetName) {
             document.getElementById('currentVoice').textContent = `Set: ${capitalizeFirstLetter(selectedSetName)}`;
@@ -379,7 +381,7 @@ document.getElementById('refreshList').addEventListener('click', function() {
     chrome.storage.local.get(['serverIp', 'connectionMode', 'relayUrl'], function(result) {
         const serverIp = result.serverIp || 'localhost';
         const connectionMode = result.connectionMode || 'relay';
-        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
+        const relayUrl = result.relayUrl || DEFAULT_RELAY_URL;
         const speakersUrl = getSpeakersUrl(connectionMode, relayUrl, serverIp);
 
         // Show loading indicator
@@ -436,7 +438,7 @@ function fetchVoicesForPlaylist() {
     chrome.storage.local.get(['serverIp', 'connectionMode', 'relayUrl'], function(result) {
         const serverIp = result.serverIp || 'localhost';
         const connectionMode = result.connectionMode || 'relay';
-        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
+        const relayUrl = result.relayUrl || DEFAULT_RELAY_URL;
         const speakersUrl = getSpeakersUrl(connectionMode, relayUrl, serverIp);
 
         // Setup timeout for the fetch operation
@@ -523,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load saved connection settings and server IP
     chrome.storage.local.get(['serverIp', 'connectionMode', 'relayUrl'], function(result) {
         const connectionMode = result.connectionMode || 'relay';
-        const relayUrl = result.relayUrl || 'https://darkfoundry.bluemediaserver.xyz';
+        const relayUrl = result.relayUrl || DEFAULT_RELAY_URL;
 
         // Set radio button
         const radioEl = document.querySelector(`input[name="connectionMode"][value="${connectionMode}"]`);

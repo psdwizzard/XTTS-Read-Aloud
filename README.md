@@ -1,149 +1,106 @@
-# XTTS-Read-Aloud
+# XTTS Read Aloud
 
-This Chrome extension integrates screen reader functionality using the XTTS API Server. Currently in beta and using the XTTS API Server backend, it will soon move to AllTalk. It enhances web accessibility with seamless text-to-speech capabilities. Licensed under the MIT License for unrestricted and commercial use.
+Chrome extension for reading selected text aloud with an XTTS server.
+
+It now supports two connection modes:
+
+- `Cloudflare Relay`: routes requests through your public Cloudflare URL
+- `Direct (LAN)`: talks straight to your XTTS server on your local network
+
+The relay mode is useful when you want the extension to work from other machines without exposing the XTTS server directly.
 
 ![Screenshot Example](images/example.png)
 
-Disclaimer:
-This is a personal project created in my free time. It does not represent my employer or their views.
+## What Changed
 
----
+- Added Cloudflare relay mode for speaker lookup and synthesis
+- Added sign-in detection for Cloudflare Access protected relays
+- Fixed audio playback handoff from the extension worker to the active tab
+- Added retry logic that injects the content script if the current tab has no receiver
 
-## Recent Improvements
+## How It Works
 
-- **Modern UI Design**: Completely redesigned interface with card-based layout and improved typography
-- **Dark Mode Support**: Added toggle for light/dark themes, saved across sessions
-- **Tabbed Interface**: Separated functionality into Server, Playlist, and Dictionary tabs
-- **Custom Pronunciation Dictionary**: Added ability to create a custom dictionary to correct mispronounced words
-- **Improved Text Processing**: Better handling of punctuation, parentheses, and special cases
-- **Custom Voice Sets**: Create and manage playlists of voices for variety in your text-to-speech experience
-- **Error Handling**: Enhanced connection error handling with clear feedback
-- **Responsive Layout**: Compact, efficient design that's easy to navigate
+### Cloudflare Relay
 
----
+In relay mode, the extension sends requests to your public Cloudflare URL instead of connecting to the XTTS server directly.
 
-## Overview of Project
+Expected relay endpoints:
 
-I use a screen reader every day for surfing the web and work. I hate how bad most voices are in screen readers, but I did not want to have a monthly subscription for a good screen reader. This extension currently works on the XTTS API Server backend, which cannot stream audio over the network as I had hoped. I wanted to deploy this on my network to use on all of my computers. I am in the process of moving this to AllTalk, but it is taking longer than expected.
+- `GET /api/tts/speakers`
+- `POST /api/tts/synthesize`
 
----
+This is the recommended mode when you are fronting XTTS with DarkFoundry or another reverse proxy over Cloudflare.
 
-## Features
+### Direct LAN
 
-### Server Tab
-- Connect to your XTTS API Server instance
-- Select from individual voices or custom voice sets
-- View your currently active voice/set
+In direct mode, the extension connects straight to your XTTS server:
 
-### Create Playlist Tab
-- Create custom voice sets by selecting multiple voices
-- Name and save playlists for later use
-- Automatically refreshes voice lists from your server
+- `GET http://YOUR_SERVER_IP:8020/speakers`
+- `POST http://YOUR_SERVER_IP:8020/tts_to_audio/`
 
-### Dictionary Tab
-- Add words that the TTS engine mispronounces
-- Provide phonetic pronunciations that sound better
-- Entries are automatically applied during text processing
-- Alphabetically sorted for easy reference
-
----
-
-## Demo Video
-
-[![Video Thumbnail](https://img.youtube.com/vi/0qcrwc7Dfww/0.jpg)](https://www.youtube.com/watch?v=0qcrwc7Dfww)
-
----
+Use this when the browser and XTTS server are on the same network and you do not need the Cloudflare relay.
 
 ## Installation
 
-### Server Installation
+### 1. Install the XTTS server
 
-This extension uses the [XTTS API Server](https://github.com/daswer123/xtts-api-server). You can find installation instructions [here](https://github.com/daswer123/xtts-api-server).
+Use the network-ready server here:
 
-### Chrome Extension Installation Instructions
+`https://github.com/psdwizzard/xtts-api-server-network`
 
-#### How to Install an Unpacked Chrome Extension
+### 2. Install the Chrome extension
 
-1. **Download or Clone the Extension Files:**
-    Ensure you have all the extension files on your local machine. If you are using GitHub, you can either download the repository as a ZIP file and extract it, or clone the repository using Git.
-
-2. **Open Chrome and Navigate to Extensions Page:**
-    - Open Google Chrome.
-    - Type `chrome://extensions/` in the address bar and press Enter.
-
-3. **Enable Developer Mode:**
-    - In the top right corner of the Extensions page, toggle the switch to enable "Developer mode".
-
-4. **Load Unpacked Extension:**
-    - Click on the "Load unpacked" button that appears.
-    - In the file dialog that opens, navigate to the directory where your extension files are located, and select the folder.
-
-5. **Verify Installation:**
-    - Once the extension is loaded, you should see it listed on the Extensions page with its name and description.
-    - You can now use the extension as you normally would.
-
----
+1. Clone or download this repository.
+2. Open `chrome://extensions/`
+3. Enable `Developer mode`
+4. Click `Load unpacked`
+5. Select this repository folder
 
 ## Setup
 
-### After Installing XTTS API Server
+### Relay Mode Setup
 
-- Put your audio clips into the speaker folder. The name you give the WAV file will be the name that shows up in the extension. For example, `Bob.wav` will show up as Bob.
+1. Open the extension popup.
+2. Leave `Connection Mode` set to `Cloudflare Relay`.
+3. Set `Relay URL` to your public Cloudflare URL.
+   Example: `https://your-cloudflare-url.example.com`
+4. Click `Save`.
+5. Click `Refresh List`.
+6. If Cloudflare Access protects the relay, complete the sign-in flow when Chrome opens it.
+7. Choose a voice or set and click `Load Selection`.
 
-### After Installing the Chrome Extension
+### Direct LAN Setup
 
-1. Pin the extension to the top for easy access.
-2. Click on it, and you will see the server IP field. You can enter `localhost` or the subnet IP address of your server (e.g., `192.168.1.100`).
-3. Click "Save".
-4. Click "Refresh List" to load all your voices.
-5. Select a voice or voice set from the dropdown.
-6. Click "Load Selection".
+1. Open the extension popup.
+2. Switch `Connection Mode` to `Direct (LAN)`.
+3. Enter your XTTS server IP.
+   Example: `192.168.1.100`
+4. Click `Save`.
+5. Click `Refresh List`.
+6. Choose a voice or set and click `Load Selection`.
 
-### Setting Up the Dictionary
+## Usage
 
-If you encounter words that the TTS engine mispronounces:
+Highlight text on a page, then either:
 
-1. Switch to the Dictionary tab.
-2. Enter the word in the "Word" field.
-3. Enter the phonetic spelling in the "Pronunciation" field.
-4. Click "Add" to save to your dictionary.
-5. The next time this word appears in text, it will automatically be replaced with your phonetic version.
+- right-click and choose `Read Aloud`
+- use the keyboard shortcut `Ctrl+Shift+S`
 
----
+## Playlists And Dictionary
 
-## Use
+- Create voice playlists from the `Create Playlist` tab
+- Add pronunciation overrides in the `Dictionary` tab
 
-Highlight any text, right-click on it, and select "Read Aloud" Orange to have the highlighted text read aloud.
+## Notes
 
----
+- Relay mode depends on your Cloudflare URL being reachable and correctly routed to your XTTS relay
+- Direct mode depends on local network access to port `8020`
+- If a page does not already have the content script loaded, the extension now injects it and retries playback automatically
 
-## Known Issues
+## Repository Defaults
 
-1. It only plays audio on the PC it's running on, not through the browser (this is why I am moving to a new backend).
-2. It has all the odd issues any audio played through XTTS would have.
-3. Text in brackets "()" is skipped; I am working on this.
-4. The UI needs improvement.
+The repository now ships with a generic relay placeholder instead of a hardcoded hostname:
 
----
+`https://your-cloudflare-url.example.com`
 
-## Voices
-
-I cannot release the voices in the demo due to copyright reasons. You will have to add your own. These clips need to be clean audio of at least 10 seconds, though most of mine are 30 seconds. I like to use Audacity to cut out large silent parts. Additionally, a well-finetuned XTTS2 model really helps.
-
----
-
-## Technical Details
-
-The extension uses Chrome's storage API to save:
-- Server IP address
-- Selected voice/set
-- Custom voice sets (playlists)
-- Custom dictionary entries
-- UI theme preference
-
-Text preprocessing pipeline:
-1. Dictionary word replacement (using custom phonetic spellings)
-2. Abbreviation expansion (e.g., "Dr." → "Doctor")
-3. Parentheses handling (keeping content with natural pauses)
-4. Special character and URL handling
-5. Natural pauses after sentence-ending punctuation
+Replace that with your own Cloudflare URL in the popup before using relay mode.
