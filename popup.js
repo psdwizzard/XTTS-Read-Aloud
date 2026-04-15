@@ -53,6 +53,36 @@ function getSpeakersUrl(connectionMode, relayUrl, serverIp) {
     return `http://${serverIp}:8020/speakers`;
 }
 
+function isCloudflareAccessUrl(url) {
+    return typeof url === 'string' && url.includes('cloudflareaccess.com');
+}
+
+function buildRelayFetchOptions(connectionMode, options = {}) {
+    if (connectionMode !== 'relay') {
+        return options;
+    }
+
+    return {
+        ...options,
+        credentials: 'include'
+    };
+}
+
+function ensureRelayAuthenticated(response, relayUrl) {
+    if (response.redirected && isCloudflareAccessUrl(response.url)) {
+        chrome.tabs.create({ url: response.url });
+        throw new Error(`Cloudflare Access sign-in required for ${relayUrl}`);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('text/html') && isCloudflareAccessUrl(response.url)) {
+        chrome.tabs.create({ url: response.url });
+        throw new Error(`Cloudflare Access sign-in required for ${relayUrl}`);
+    }
+
+    return response;
+}
+
 function displayCurrentVoice() {
     chrome.storage.local.get(['selectedVoice', 'selectedSet', 'serverIp', 'connectionMode', 'relayUrl'], function(result) {
         const selectedVoiceId = result.selectedVoice || '';
@@ -65,7 +95,8 @@ function displayCurrentVoice() {
             document.getElementById('currentVoice').textContent = `Set: ${capitalizeFirstLetter(selectedSetName)}`;
         } else if (selectedVoiceId) {
             const speakersUrl = getSpeakersUrl(connectionMode, relayUrl, serverIp);
-            fetch(speakersUrl)
+            fetch(speakersUrl, buildRelayFetchOptions(connectionMode))
+                .then(response => ensureRelayAuthenticated(response, relayUrl))
                 .then(response => response.json())
                 .then(voices => {
                     const currentVoice = voices.find(v => v.voice_id === selectedVoiceId);
@@ -360,7 +391,8 @@ document.getElementById('refreshList').addEventListener('click', function() {
             headers: {
                 'Accept': 'application/json',
                 'Cache-Control': 'no-cache'
-            }
+            },
+            ...buildRelayFetchOptions(connectionMode)
         });
 
         // Set a timeout of 5 seconds
@@ -371,6 +403,7 @@ document.getElementById('refreshList').addEventListener('click', function() {
         // Race between fetch and timeout
         Promise.race([fetchPromise, timeoutPromise])
             .then(response => {
+                ensureRelayAuthenticated(response, relayUrl);
                 if (!response.ok) {
                     throw new Error(`Server returned ${response.status}: ${response.statusText}`);
                 }
@@ -412,7 +445,8 @@ function fetchVoicesForPlaylist() {
             headers: {
                 'Accept': 'application/json',
                 'Cache-Control': 'no-cache'
-            }
+            },
+            ...buildRelayFetchOptions(connectionMode)
         });
 
         // Set a timeout of 5 seconds
@@ -423,6 +457,7 @@ function fetchVoicesForPlaylist() {
         // Race between fetch and timeout
         Promise.race([fetchPromise, timeoutPromise])
             .then(response => {
+                ensureRelayAuthenticated(response, relayUrl);
                 if (!response.ok) {
                     throw new Error(`Server returned ${response.status}: ${response.statusText}`);
                 }

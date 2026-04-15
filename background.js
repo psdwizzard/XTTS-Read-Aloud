@@ -96,6 +96,36 @@ function fetchRandomVoiceFromSet(setName, voiceSets) {
     });
 }
 
+function isCloudflareAccessUrl(url) {
+    return typeof url === 'string' && url.includes('cloudflareaccess.com');
+}
+
+function buildRelayFetchOptions(connectionMode, options = {}) {
+    if (connectionMode !== 'relay') {
+        return options;
+    }
+
+    return {
+        ...options,
+        credentials: 'include'
+    };
+}
+
+function ensureRelayAuthenticated(response, relayUrl) {
+    if (response.redirected && isCloudflareAccessUrl(response.url)) {
+        chrome.tabs.create({ url: response.url });
+        throw new Error(`Cloudflare Access sign-in required for ${relayUrl}`);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('text/html') && isCloudflareAccessUrl(response.url)) {
+        chrome.tabs.create({ url: response.url });
+        throw new Error(`Cloudflare Access sign-in required for ${relayUrl}`);
+    }
+
+    return response;
+}
+
 // Context menu click handler
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
     if (info.menuItemId === "readAloud" && info.selectionText) {
@@ -214,9 +244,11 @@ function fetchAudio(text, voiceId, serverIp) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(bodyPayload)
+            body: JSON.stringify(bodyPayload),
+            ...buildRelayFetchOptions(connectionMode)
         })
         .then(response => {
+            ensureRelayAuthenticated(response, relayUrl);
             if (!response.ok) {
                 throw new Error('Failed to fetch audio: ' + response.statusText);
             }
