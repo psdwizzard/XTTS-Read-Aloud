@@ -7,7 +7,11 @@
     "storage",
     "contextMenus",
     "tabs",
-    "scripting"
+    "scripting",
+    "offscreen",
+    "clipboardRead",
+    "clipboardWrite",
+    "debugger"
   ],
   "host_permissions": [
     "http://*/*",

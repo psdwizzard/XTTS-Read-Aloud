@@ -1,87 +1,205 @@
+/* ============================================================
+   XTTS Read Aloud — Liquid Glass UI
+   ============================================================ */
+
 :root {
-    --bg-color: #ffffff;
-    --text-color: #333333;
-    --accent-color: #ff6b00;
-    --primary-btn: #ff9933;
-    --primary-btn-hover: #ff8000;
-    --secondary-btn: #e0e0e0;
-    --secondary-btn-hover: #d0d0d0;
-    --input-bg: #ffffff;
-    --input-border: #cccccc;
-    --card-bg: #f8f8f8;
-    --slider-bg: #dddddd;
-    --slider-thumb: #ff6b00;
-    --tab-active-bg: #ff6b00;
-    --tab-inactive-bg: #ff9933;
+    /* Brand */
+    --accent: #ff7a1a;
+    --accent-soft: #ff9f4d;
+    --danger: #ff5a52;
+
+    /* Light theme surface */
+    --bg-grad-1: #fbe9d6;
+    --bg-grad-2: #f5d9f0;
+    --bg-grad-3: #dce7ff;
+    --text: #2a2320;
+    --text-dim: rgba(42, 35, 32, 0.6);
+
+    /* Glass */
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-bg-strong: rgba(255, 255, 255, 0.72);
+    --glass-border: rgba(255, 255, 255, 0.75);
+    --glass-shadow: rgba(60, 40, 20, 0.18);
+    --glass-highlight: rgba(255, 255, 255, 0.9);
+
+    --field-bg: rgba(255, 255, 255, 0.6);
+    --field-border: rgba(120, 100, 90, 0.22);
 }
 
 [data-theme="dark"] {
-    --bg-color: #222222;
-    --text-color: #f0f0f0;
-    --accent-color: #ff7f1f;
-    --primary-btn: #e65c00;
-    --primary-btn-hover: #ff8000;
-    --secondary-btn: #444444;
-    --secondary-btn-hover: #555555;
-    --input-bg: #333333;
-    --input-border: #555555;
-    --card-bg: #333333;
-    --slider-bg: #555555;
-    --slider-thumb: #ff7f1f;
-    --tab-active-bg: #e65c00;
-    --tab-inactive-bg: #b34700;
+    --accent: #ff8a33;
+    --accent-soft: #ffab5e;
+    --danger: #ff6b63;
+
+    --bg-grad-1: #241a12;
+    --bg-grad-2: #1a1520;
+    --bg-grad-3: #10161f;
+    --text: #f3ede8;
+    --text-dim: rgba(243, 237, 232, 0.55);
+
+    --glass-bg: rgba(255, 255, 255, 0.07);
+    --glass-bg-strong: rgba(255, 255, 255, 0.12);
+    --glass-border: rgba(255, 255, 255, 0.14);
+    --glass-shadow: rgba(0, 0, 0, 0.45);
+    --glass-highlight: rgba(255, 255, 255, 0.18);
+
+    --field-bg: rgba(255, 255, 255, 0.06);
+    --field-border: rgba(255, 255, 255, 0.14);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    width: 340px;
     margin: 0;
-    padding: 10px;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    transition: all 0.3s ease;
-    min-width: 280px;
-    max-width: 320px;
-    font-size: 14px;
+    padding: 14px;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.4;
+    background:
+        radial-gradient(120% 100% at 0% 0%, var(--bg-grad-1) 0%, transparent 55%),
+        radial-gradient(120% 100% at 100% 0%, var(--bg-grad-2) 0%, transparent 55%),
+        linear-gradient(160deg, var(--bg-grad-2), var(--bg-grad-3));
+    background-attachment: fixed;
+    transition: color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
 }
 
+/* ---------- Shared glass surface ---------- */
+.play-bar,
+.content,
+.current-voice,
+.tab-navigation {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow:
+        0 6px 20px var(--glass-shadow),
+        inset 0 1px 0 var(--glass-highlight);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+}
+
+/* ---------- Header ---------- */
 .header {
-    text-align: center;
-    padding: 5px;
-    margin-bottom: 5px;
-    border-bottom: 2px solid var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 4px 0 12px;
+}
+
+.header img {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    box-shadow: 0 2px 8px var(--glass-shadow);
 }
 
 .header h1 {
-    margin: 5px 0;
-    color: var(--accent-color);
-    font-size: 18px;
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    background: linear-gradient(120deg, var(--accent), var(--accent-soft));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-/* Tab Navigation */
+/* ---------- Play bar ---------- */
+.play-bar {
+    padding: 14px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+#playSelection {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    box-shadow:
+        0 6px 16px rgba(255, 122, 26, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.12s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+#playSelection:hover {
+    transform: translateY(-1px);
+    box-shadow:
+        0 10px 22px rgba(255, 122, 26, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+#playSelection:active {
+    transform: translateY(0);
+}
+
+#playSelection:disabled {
+    opacity: 0.55;
+    cursor: default;
+    transform: none;
+}
+
+.play-hint {
+    margin: 10px 2px 0;
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.4;
+}
+
+.play-status {
+    margin: 8px 0 0;
+    font-size: 11px;
+    min-height: 14px;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+/* ---------- Tabs ---------- */
 .tab-navigation {
     display: flex;
+    gap: 4px;
+    padding: 4px;
     margin-bottom: 10px;
-    width: 100%;
+    border-radius: 14px;
 }
 
 .tab-button {
     flex: 1;
-    background-color: var(--tab-inactive-bg);
-    color: white;
-    padding: 8px 0;
+    padding: 8px 4px;
     border: none;
-    border-radius: 4px 4px 0 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-dim);
+    font-size: 11.5px;
+    font-weight: 600;
     cursor: pointer;
-    font-weight: bold;
-    margin: 0 2px;
-    font-size: 12px;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tab-button:hover {
+    color: var(--text);
 }
 
 .tab-button.active {
-    background-color: var(--tab-active-bg);
+    color: #fff;
+    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    box-shadow:
+        0 4px 10px rgba(255, 122, 26, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-/* Tab Content */
+/* ---------- Tab content ---------- */
 .tab-content {
     display: none;
 }
@@ -90,257 +208,318 @@ body {
     display: block;
 }
 
-.content, .current-voice, .theme-toggle {
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 6px;
-    background-color: var(--card-bg);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.content {
+    padding: 14px;
 }
 
 .current-voice {
+    margin-top: 10px;
+    padding: 12px 14px;
     text-align: center;
-}
-
-button {
-    margin: 3px;
-    padding: 8px 12px;
-    background-color: var(--primary-btn);
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-    font-weight: bold;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    font-size: 12px;
-}
-
-button:hover {
-    background-color: var(--primary-btn-hover);
-    transform: translateY(-1px);
-}
-
-#toggleTheme {
-    background-color: var(--secondary-btn);
-    color: var(--text-color);
-    margin-top: 5px;
-    font-size: 12px;
-}
-
-#toggleTheme:hover {
-    background-color: var(--secondary-btn-hover);
-}
-
-select, input[type="text"] {
-    width: 100%;
-    margin: 5px 0;
-    padding: 6px;
-    border-radius: 4px;
-    border: 1px solid var(--input-border);
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    font-size: 12px;
-}
-
-.current-voice p {
-    font-weight: bold;
-    color: var(--text-color);
-    font-size: 14px;
 }
 
 .current-voice h2 {
-    font-size: 16px;
-    margin: 5px 0;
+    margin: 0 0 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-dim);
 }
 
-.header img {
-    width: 40px;
-    height: 40px;
+.current-voice p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
 }
 
+/* ---------- Buttons ---------- */
+button {
+    padding: 9px 14px;
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    background: var(--glass-bg-strong);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 1px 0 var(--glass-highlight);
+    transition: transform 0.12s ease, background 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    background: var(--glass-border);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* ---------- Inputs ---------- */
 label {
     display: block;
-    margin-bottom: 3px;
+    margin-bottom: 5px;
+    font-size: 11px;
     font-weight: 600;
+    color: var(--text-dim);
+}
+
+select,
+input[type="text"] {
+    width: 100%;
+    padding: 9px 11px;
+    margin: 0;
+    border-radius: 10px;
+    border: 1px solid var(--field-border);
+    background: var(--field-bg);
+    color: var(--text);
     font-size: 12px;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.theme-toggle {
-    text-align: center;
+select:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255, 122, 26, 0.18);
 }
 
-/* Voice list in playlist tab */
-.voice-list-container {
-    max-height: 200px;
-    overflow-y: auto;
-    margin: 10px 0;
-    border: 1px solid var(--input-border);
-    border-radius: 4px;
-    background-color: var(--input-bg);
-}
-
-.voice-checkboxes {
-    padding: 5px;
-}
-
-.voice-checkbox-item {
-    display: flex;
-    align-items: center;
-    padding: 4px 0;
-}
-
-.voice-checkbox-item input[type="checkbox"] {
-    margin-right: 8px;
-}
-
-/* Connection Mode */
+/* ---------- Connection mode ---------- */
 .connection-mode-container {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .radio-group {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     margin-top: 4px;
 }
 
 .radio-label {
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-weight: normal;
-    font-size: 12px;
+    justify-content: center;
+    gap: 6px;
+    margin: 0;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid var(--field-border);
+    background: var(--field-bg);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text);
     cursor: pointer;
-    margin-bottom: 0;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.radio-label:has(input:checked) {
+    border-color: var(--accent);
+    background: rgba(255, 122, 26, 0.12);
 }
 
 .radio-label input[type="radio"] {
     margin: 0;
-    accent-color: var(--accent-color);
+    accent-color: var(--accent);
 }
 
-.relay-url-container {
-    margin-bottom: 8px;
-}
-
-.relay-url-container input[type="text"] {
-    width: 100%;
-}
-
-.save-connection-container {
-    margin-bottom: 5px;
-}
-
-.save-connection-container button {
-    width: 100%;
-}
-
-/* Server IP input container */
+.relay-url-container,
 .server-ip-container {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    margin-bottom: 5px;
+    margin-bottom: 12px;
 }
 
-.server-ip-input {
-    flex: 1;
-}
-
-.server-ip-input input[type="text"] {
-    width: 140px;
-}
-
+.save-connection-container button,
 #saveServerIp {
-    white-space: nowrap;
-    padding: 6px 12px;
-    margin-bottom: 5px;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
-/* Button row for refresh and load */
+/* ---------- Button row ---------- */
 .button-row {
     display: flex;
-    justify-content: space-between;
     gap: 8px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .button-row button {
     flex: 1;
 }
 
-/* Dictionary styles */
+/* ---------- Playlist tab ---------- */
+#playlistName {
+    margin-bottom: 10px;
+}
+
+#refreshVoices,
+#savePlaylist {
+    width: 100%;
+}
+
+#refreshVoices {
+    margin-bottom: 10px;
+}
+
+.voice-list-container {
+    max-height: 190px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid var(--field-border);
+    background: var(--field-bg);
+}
+
+.voice-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.voice-checkbox-item:hover {
+    background: var(--glass-bg);
+}
+
+.voice-checkbox-item input[type="checkbox"] {
+    accent-color: var(--accent);
+    margin: 0;
+}
+
+.voice-checkbox-item label {
+    margin: 0;
+    font-weight: 500;
+    color: var(--text);
+}
+
+/* ---------- Dictionary tab ---------- */
 .dictionary-form {
-    margin-bottom: 15px;
     display: flex;
     align-items: flex-end;
     gap: 8px;
+    margin-bottom: 4px;
 }
 
 .dictionary-inputs {
     flex: 1;
+    min-width: 0;
 }
 
 .form-group {
     margin-bottom: 8px;
 }
 
-.form-group input[type="text"] {
-    width: 180px;
+.form-group:last-child {
+    margin-bottom: 0;
 }
 
 #addToDictionary {
     white-space: nowrap;
-    padding: 6px 12px;
-    margin-bottom: 5px;
-    height: 29px;
 }
 
 .dictionary-list-container {
-    max-height: 200px;
+    max-height: 190px;
     overflow-y: auto;
-    border: 1px solid var(--input-border);
-    border-radius: 4px;
-    background-color: var(--input-bg);
-    margin-top: 15px;
+    margin-top: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--field-border);
+    background: var(--field-bg);
 }
 
 .dictionary-list-container h3 {
-    margin: 0;
-    padding: 8px;
-    font-size: 14px;
-    border-bottom: 1px solid var(--input-border);
-    background-color: var(--card-bg);
     position: sticky;
     top: 0;
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-dim);
+    background: var(--glass-bg-strong);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--field-border);
+    border-radius: 12px 12px 0 0;
 }
 
 .dictionary-entries {
-    padding: 5px;
+    padding: 6px;
 }
 
 .dictionary-entry {
-    padding: 6px;
-    border-bottom: 1px solid var(--input-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 8px;
 }
 
-.dictionary-entry:last-child {
-    border-bottom: none;
+.dictionary-entry:hover {
+    background: var(--glass-bg);
 }
 
 .entry-word {
-    font-weight: bold;
+    font-weight: 700;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .entry-pronunciation {
-    color: var(--accent-color);
+    color: var(--accent);
     font-style: italic;
+    font-size: 11px;
 }
 
 .entry-actions button {
-    padding: 3px 6px;
+    padding: 4px 9px;
     font-size: 10px;
+    color: var(--danger);
+}
+
+.entry-actions button:hover {
+    background: rgba(255, 90, 82, 0.15);
+}
+
+/* ---------- Theme toggle ---------- */
+.theme-toggle {
+    text-align: center;
+    margin-top: 12px;
+}
+
+#toggleTheme {
+    background: transparent;
+    border: 1px solid var(--field-border);
+    color: var(--text-dim);
+    box-shadow: none;
+    font-size: 11px;
+}
+
+#toggleTheme:hover {
+    color: var(--text);
+    background: var(--glass-bg);
+}
+
+/* ---------- Scrollbars ---------- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--field-border);
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-dim);
 }

@@ -5,12 +5,18 @@
     <title>XTTS Read Aloud Settings</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-theme="dark">
     <div class="header">
         <img src="images/icon128.png" alt="Logo">
         <h1>XTTS Read Aloud</h1>
     </div>
-    
+
+    <!-- Primary action: read the current selection (or clipboard, in Google Docs) -->
+    <div class="play-bar">
+        <button id="playSelection">▶ Play Selected Text</button>
+        <p class="play-status" id="playStatus"></p>
+    </div>
+
     <!-- Tab navigation -->
     <div class="tab-navigation">
         <button class="tab-button active" data-tab="server-tab">Server</button>
@@ -53,9 +59,8 @@
             
             <div class="button-row">
                 <button id="refreshList">Refresh List</button>
-                <button id="loadVoice">Load Selection</button>
             </div>
-            
+
             <select id="voiceList">
                 <option value="">-- Select a Voice or Set --</option>
             </select>
@@ -115,7 +120,7 @@
 
     <!-- Theme toggle button -->
     <div class="theme-toggle">
-        <button id="toggleTheme">Toggle Dark Mode</button>
+        <button id="toggleTheme">◐ Toggle Theme</button>
     </div>
 
     <script src="popup.js"></script>

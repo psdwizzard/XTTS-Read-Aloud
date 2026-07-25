@@ -475,14 +475,49 @@ function fetchVoicesForPlaylist() {
     });
 }
 
-document.getElementById('loadVoice').addEventListener('click', function() {
-    const selectedValue = document.getElementById('voiceList').value;
+// Load the voice/set automatically as soon as one is picked from the dropdown.
+document.getElementById('voiceList').addEventListener('change', function() {
+    const selectedValue = this.value;
     if (selectedValue === "") {
-        alert("Please select a voice or set.");
         return;
     }
     fetchVoiceSets(function(voiceSets) {
         loadSelection(selectedValue, voiceSets);
+    });
+});
+
+// --- Play Selected Text button -------------------------------------------
+
+function setPlayStatus(message, isError) {
+    const statusEl = document.getElementById('playStatus');
+    if (!statusEl) return;
+    statusEl.textContent = message || '';
+    statusEl.style.color = isError ? '#e53935' : 'var(--accent-color)';
+}
+
+// The background service worker owns this flow: it reads the live selection on
+// normal pages, and on Google Docs it uses the debugger API to send a real
+// Ctrl+C, grab the selection off the clipboard, and restore the clipboard.
+document.getElementById('playSelection').addEventListener('click', function() {
+    const button = this;
+    button.disabled = true;
+    setPlayStatus('Getting text…', false);
+
+    chrome.runtime.sendMessage({ action: 'playFromPopup' }, response => {
+        button.disabled = false;
+
+        if (chrome.runtime.lastError) {
+            console.error('[XTTS] Play Selected Text failed:', chrome.runtime.lastError.message);
+            setPlayStatus('Error: ' + chrome.runtime.lastError.message, true);
+            return;
+        }
+
+        if (!response || !response.ok) {
+            setPlayStatus((response && response.error) || 'Could not read text from this page.', true);
+            return;
+        }
+
+        setPlayStatus('Playing…', false);
     });
 });
 
